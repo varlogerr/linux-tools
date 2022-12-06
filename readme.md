@@ -1,28 +1,10 @@
-# <a id="top"></a>TITLE
+# <a id="top"></a>Linux tools
 
-Description
+Set of tools for Linux configuration
 
-* [Quick demo](#quick-demo)
-* [Installation](#installation)
-* [Usage](#usage)
+## Categories
 
-## Quick demo
-
-```sh
-# quick demo commands
-```
-
-[To top]
-
-## Installation
-
-Installation instructions
-
-[To top]
-
-## Usage
-
-Usage instructions
+* [Proxmox](proxmox)
 
 [To top]
 
