@@ -1,9 +1,9 @@
 # install tool specific libs
-. "$(lt_dl .deps/pve-post-install/lib.main.sh .deps/pve-post-install/lib.main.sh)"
+. "$(lt_dl ".deps/${LT_BASEDIR}/lib.main.sh" ".deps/${LT_BASEDIR}/lib.main.sh")"
 
 trap_help_opt "${@}" && print_help && exit
 
-SRC_INC_OPTS="$(lt_dl .deps/pve-post-install/inc.opts.sh .deps/pve-post-install/inc.opts.sh)"
+SRC_INC_OPTS="$(lt_dl ".deps/${LT_BASEDIR}/inc.opts.sh" ".deps/${LT_BASEDIR}/inc.opts.sh")"
 . "${SRC_INC_OPTS}" || trap_fatal $? "Can't source ${SRC_INC_OPTS}"
 
 log_info "Checking prereqs ..."
@@ -14,6 +14,13 @@ pve_is_version7 || trap_fatal --decore $? "
 "
 sys_must_root
 log_info "OK"
+
+log_info ""
+log_info "Configuration to be applied:"
+for k in ${!OPTS[@]}; do
+  printf '%s=%s\n' "${k}" "${OPTS[$k]}"
+done | grep -E '^[[:upper:]]' | sort -n \
+| sed 's/^/  /' | log_info
 
 while ! ${OPTS[confirm]}; do
   read -p "Apply configuration [y/N]: " -r

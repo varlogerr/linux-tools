@@ -4,8 +4,7 @@ declare -A OPTS=(
   [confirm]=false
 )
 
-endopts=false
-while :; do
+endopts=false; while :; do
   [[ -n "${1+x}" ]] || break
   ${endopts} && arg='*' || arg="${1}"
 
@@ -94,7 +93,7 @@ for k in "${!risky_opts[@]}"; do
   ${OPTS[$k]} && risky_changes+=([${k}]="${risky_opts[$k]}")
 done
 
-[[ ${#risky_changes[@]} -gt 0 ]] && {
+[[ ${#risky_changes[@]} -lt 1 ]] || {
   echo "Potentially risky changes:"
   for k in "${!risky_changes[@]}"; do
     echo "* ${k} - ${risky_changes[$k]}"

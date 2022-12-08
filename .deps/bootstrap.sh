@@ -8,8 +8,8 @@ declare -a libs=(
   . "$(lt_dl ".deps/lib.${l}.sh" ".deps/lib.${l}.sh")"
 done
 
-# apply shlib overrides
-LOG_TOOLNAME="${LT_TOOLNAME}"
+# # apply shlib overrides
+# LOG_TOOLNAME="${LT_TOOLNAME}"
 
 # execute tool bootstrap
 SRC_BOOTSTRAP="$(lt_dl ".deps/${LT_BOOTSTRAP}" ".deps/${LT_BOOTSTRAP}")"

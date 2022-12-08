@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-LT_BOOTSTRAP=pve-post-install/bootstrap.sh
+LT_BASEDIR=pve-helper-install
+LT_BOOTSTRAP="${LT_BASEDIR}/bootstrap.sh"
 
 # {BOILERPLATE}
   #
@@ -10,6 +11,7 @@ LT_BOOTSTRAP=pve-post-install/bootstrap.sh
   # Overrides can be done with pre-set env vars.
   #
   # Must overrides:
+  #   * LT_BASEDIR
   #   * LT_BOOTSTRAP
   # More available overrides:
   #   * LT_BRANCH
@@ -21,9 +23,10 @@ LT_BOOTSTRAP=pve-post-install/bootstrap.sh
   LT_BRANCH="${LT_BRANCH:-master}"
   LT_DEPSDIR="${LT_DEPSDIR:-$(mktemp -d --suffix -linux-tools 2>/dev/null)}" \
     || { echo "Can't create temp directory" >&2; exit; }
+  LT_BASEDIR="${LT_BASEDIR}"
   LT_BOOTSTRAP="${LT_BOOTSTRAP}"
 
-  LT_HOMEURL=https://github.com/varlogerr/proxmox-tools/raw/${LT_BRANCH}
+  LT_HOMEURL=https://github.com/varlogerr/linux-tools/raw/${LT_BRANCH}
 
   #
   # BASIC FUNCTIONS
@@ -35,7 +38,7 @@ LT_BOOTSTRAP=pve-post-install/bootstrap.sh
     local rc=${?}
     [[ "${rc}" -gt 0 ]] || return
     declare -F trap_fatal &> /dev/null \
-    && trap_fatal ${rc} 'No pve detected!' \
+    && trap_fatal ${rc} "${1}" \
     || { echo "${1}" >&2; exit ${rc}; }
   }
 

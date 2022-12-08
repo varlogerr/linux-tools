@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Backed up as LSC container disks can be resized via web-UI
+
+TOOL_PATH="$(realpath -- "${BASH_SOURCE[0]}")"
+BINDIR="$(realpath -- "$(dirname -- "${TOOL_PATH}")")"
+INCDIR="$(realpath -- "${BINDIR}/../inc")"
+TOOLNAME="$(basename "${TOOL_PATH}")"
+
+. "${INCDIR}/lib.shlib.sh"
+. "${INCDIR}/lib.ct.sh"
+. "${INCDIR}/lib.pve.sh"
+. "${INCDIR}/lib.sys.sh"
+
+print_help() {
+  text_decore "
+    Resize LXC container rootfs disk size
+   .
+    USAGE:
+   .  ${TOOLNAME}
+  "
+}; trap_help_opt "${@}" && print_help && exit
+
+. "${INCDIR}/inc.pve-prereq-root-pve.sh"
+
+disk_check_size() {
+  local size="${1}"
+
+  grep -q '^+\?[1-9][0-9]*\(\.[0-9]*[1-9]\)\?[KMGT]$' <<< "${size}"
+}
+
+declare -A OPTS=(
+  [confirm]=false
+  [id]=
+  [size]=
+)
+
+. "${INCDIR}/inc.ct-read-id.sh"
+
+print_stderr ""
+
+while [[ -z "${OPTS[size]}" ]]; do
+  text_decore "
+    Valid size examples: +1K, +10.5M, 30G, 1T
+  " | print_stderr
+  read -p "Select size: " -r
+
+  disk_check_size "${REPLY}" || {
+    print_stderr "Invalid size format!"
+    continue
+  }
+
+  OPTS[size]="${REPLY}"
+done
+
+text_decore "
+  The following configuration will be applied:
+  Container: $(ct_get_id_name_by_id "${OPTS[id]}")
+  Disk size: ${OPTS[size]}
+" | log_info
+
+while ! ${OPTS[confirm]}; do
+  read -p "Confirm [y/N]: " -r
+  [[ "${REPLY,}" == y ]] && { OPTS[confirm]=true; continue; }
+  [[ "${REPLY,}" == n ]] && exit
+  [[ -z "${REPLY}" ]] && exit
+  print_stderr "Invalid response!"
+done
+
+ct_check_id "${OPTS[id]}" || trap_fatal $? "
+  Invalid LXC container ID: ${OPTS[id]}
+"
+
+print_stderr ""
+(set -x; pct resize "${OPTS[id]}" rootfs "${OPTS[size]}")
